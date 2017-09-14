@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--Import Google Icon Font-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	rel="stylesheet">
+<!--Import materialize.css-->
+<link type="text/css" rel="stylesheet" href="css/materialize.min.css"
+	media="screen,projection" />
+<link rel="stylesheet" href="css/jqcloud.min.css">
+<!--Let browser know website is optimized for mobile-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<!-- Modal Trigger -->
+			<a class="waves-effect waves-light btn modal-trigger" href="#modal1"
+				id="show_views">LDA</a>
+			<ul class="collapsible" data-collapsible="accordion" id="result">
+			  </ul>
+			<!-- Modal Structure -->
+			<div id="modal1" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h5 style="text-align: center;">
+						Select views (notes selected: <span id="notecount">0</span>)
+						</h4>
+						<hr>
+						<form action="#" id="views">
+							
+						</form>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" id="startlda"
+						class="modal-action waves-effect waves-green btn-flat ">Start</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Import jQuery before materialize.js-->
+	<script type="text/javascript"
+		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="js/materialize.min.js"></script>
+	<script src="js/jqcloud.min.js"></script>
+
+
+	<script>
+		$(document).ready(function() {
+			$('select').material_select();
+			$('.modal').modal();
+			$("#show_views").click(function() {
+				$.ajax({
+					url : 'Show_view_list',
+					type : 'GET',
+					success : function(response) {
+						var json = $.parseJSON(response);
+						var p;
+						for (var i = 0; i < json.length; i++) {
+							p = $('<p/>');
+							//p.append("<td>" + json[i].id + "</td>");
+							p.append('<input type="checkbox" id="'+json[i].idview+'" title="'+json[i].count+'" /> <label for="'+json[i].idview+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
+							$('#views').append(p);
+						}
+						console.log(json);
+					}
+				});
+			});
+			var count=0;
+			
+			$(document).on('click', 'input' , function() {
+				console.log($(this));
+				console.log($(this)[0].checked);
+				console.log($(this)[0].title);
+				console.log(parseInt($(this)[0].title));
+				if($(this)[0].checked == false){
+					count -= parseInt($(this)[0].title)
+					$("#notecount").text(count);
+				}
+				else if($(this)[0].checked == true){
+					count += parseInt($(this)[0].title)
+					$("#notecount").text(count);
+				}
+			});
+			var words = [
+				  {text: "Lorem", weight: 13},
+				  {text: "Ipsum", weight: 10.5},
+				  {text: "Dolor", weight: 9.4},
+				  {text: "Sit", weight: 8},
+				  {text: "Amet", weight: 6.2},
+				  {text: "Consectetur", weight: 5},
+				  {text: "Adipiscing", weight: 5},
+				  /* ... */
+				];
+			$("#startlda").click(function() {
+				var sql = "";
+				var tag = 0;
+				$("input:checkbox:checked").each(function(){
+					if(tag == 0){
+				    	sql += "viewid=" + $(this)[0].id;
+				    	tag += 1;
+					}
+					else{
+						sql += "+or+viewid=" + $(this)[0].id;
+					}
+				});
+				console.log(sql)
+				$.ajax({
+					url : "http://0.0.0.0:5000/lda_process?user='root'&password='051633b$'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
+					type : 'GET',
+					success : function(response) {
+						$('#modal1').modal('close');
+						console.log(response.lda_msg.topic_ids);
+						tmp = response.lda_msg.topic_ids.replace("['", "").replace("']", "").split("', '");
+						var li;
+						var newdiv;
+						for (var i = 0; i < tmp.length; i++) {
+						    console.log(tmp[i]);
+						    $.ajax({
+						        url: 'Show_lda_result',
+						        type: 'GET',
+						        data: {id: tmp[i]},
+						        success: function (r) {
+						        	var rjson = $.parseJSON(r);
+						        	console.log(rjson[0]);
+						        	li = $('<li/>');
+									//p.append("<td>" + json[i].id + "</td>");
+									li.append('<div class="collapsible-header">'+rjson[0].topic_name+'</div><div class="collapsible-body" id="'+rjson[0].topic_id+'"><span>' + r + '</span></div>');
+									$('#result').append(li);
+									
+									words = rjson[0].top_words.replace("['", "").replace("']", "").split("', '");
+									weights = rjson[0].word_prob.replace("[", "").replace("]", "").split(", ");
+									console.log(words);
+									console.log(weights);
+									
+									var ttt = [];
+									for (var j = 0; j < words.length; j++){
+										console.log(parseFloat(weights[j])*100);
+										ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
+									}
+									
+									newdiv = $('<div></div>').jQCloud(ttt, {
+										  width: 800,
+										  height: 600
+										});
+									$('#'+rjson[0].topic_id+'').append(newdiv);
+									
+						        }
+						    });
+						}
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>
