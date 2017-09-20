@@ -24,7 +24,7 @@ public abstract class DAO {
 		try
 		{
 			String uri="jdbc:mysql://localhost:3306/builder_ikit_org_GES_2014_2015";
-			con=DriverManager.getConnection(uri,"root","051633b$");
+			con=DriverManager.getConnection(uri,"root","DtZBAxrN57Mx");
 			PreparedStatement ps = con.prepareStatement(sql);
 			rs=ps.executeQuery();
 			JSONArray array = new JSONArray(); 

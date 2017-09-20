@@ -107,7 +107,7 @@
 				});
 				console.log(sql)
 				$.ajax({
-					url : "http://naifeng.uab.albany.edu:5000/lda_process?user='root'&password='051633b$'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
+					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
 					type : 'GET',
 					success : function(response) {
 						$('#modal1').modal('close');
