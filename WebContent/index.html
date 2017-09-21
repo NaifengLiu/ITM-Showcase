@@ -34,11 +34,25 @@
 				<div class="modal-footer">
 					<a href="#!" id="startlda"
 						class="modal-action waves-effect waves-green btn-flat ">Start</a>
+						<div class="preloader-wrapper big active" id="pre" style="display:none">
+						    <div class="spinner-layer spinner-blue-only">
+						      <div class="circle-clipper left">
+						        <div class="circle"></div>
+						      </div>
+						      <div class="gap-patch">
+						        <div class="circle"></div>
+						      </div>
+						      <div class="circle-clipper right">
+						        <div class="circle"></div>
+						      </div>
+						    </div>
+						</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
+	
+	
 	<!--Import jQuery before materialize.js-->
 	<script type="text/javascript"
 		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -96,6 +110,7 @@
 			$("#startlda").click(function() {
 				var sql = "";
 				var tag = 0;
+				$('#pre').show();
 				$("input:checkbox:checked").each(function(){
 					if(tag == 0){
 				    	sql += "viewid=" + $(this)[0].id;
@@ -105,16 +120,19 @@
 						sql += "+or+viewid=" + $(this)[0].id;
 					}
 				});
+				
 				console.log(sql)
 				$.ajax({
-					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
+					url : "http://0.0.0.0:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
 					type : 'GET',
 					success : function(response) {
 						$('#modal1').modal('close');
+						$('#pre').hide();
 						console.log(response.lda_msg.topic_ids);
 						tmp = response.lda_msg.topic_ids.replace("['", "").replace("']", "").split("', '");
 						var li;
 						var newdiv;
+						var form;
 						for (var i = 0; i < tmp.length; i++) {
 						    console.log(tmp[i]);
 						    $.ajax({
@@ -125,8 +143,7 @@
 						        	var rjson = $.parseJSON(r);
 						        	console.log(rjson[0]);
 						        	li = $('<li/>');
-									//p.append("<td>" + json[i].id + "</td>");
-									li.append('<div class="collapsible-header">'+rjson[0].topic_name+'</div><div class="collapsible-body" id="'+rjson[0].topic_id+'"><span>' + r + '</span></div>');
+									li.append('<div class="collapsible-header">'+rjson[0].topic_name+'</div><div class="collapsible-body" id="'+rjson[0].topic_id+'"></div>');
 									$('#result').append(li);
 
 									words = rjson[0].top_words.replace("['", "").replace("']", "").split("', '");
@@ -145,6 +162,25 @@
 										  height: 600
 										});
 									$('#'+rjson[0].topic_id+'').append(newdiv);
+									
+									notes_id = rjson[0].top_notes_id;
+									console.log(notes_id);
+									
+									$.ajax({
+										url: 'Show_notes',
+								        type: 'POST',
+								        data: {notes_id: notes_id},
+								        success: function (n) {
+								        	var njson = $.parseJSON(n);
+								        	console.log(njson);
+								        	form = $('<form action="#" />');
+								        	for (var k = 0; k < njson.length; k++) {
+									        	form.append('<p><input type="checkbox" id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
+												
+											}
+								        	$('#'+rjson[0].topic_id+'').append(form);
+								        }
+									})
 
 						        }
 						    });
