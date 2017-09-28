@@ -10,45 +10,65 @@
 <link rel="stylesheet" href="css/jqcloud.min.css">
 <!--Let browser know website is optimized for mobile-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -100px;
+}
+</style>
+
 </head>
 
 <body>
 	<div class="container">
 		<div class="row">
 			<!-- Modal Trigger -->
-			<a class="waves-effect waves-light btn modal-trigger" href="#modal1"
-				id="show_views">LDA</a>
-			<ul class="collapsible" data-collapsible="accordion" id="result">
-			  </ul>
-			<!-- Modal Structure -->
-			<div id="modal1" class="modal modal-fixed-footer">
-				<div class="modal-content">
-					<h5 style="text-align: center;">
-						Select views (notes selected: <span id="notecount">0</span>)
-						</h4>
-						<hr>
-						<form action="#" id="views">
 
-						</form>
+			<!-- Modal Structure -->
+			<div class="col s12" id="views_div">
+				<h5 style="text-align: center;">
+					Select views (notes selected: <span id="notecount">0</span>)
+				</h5>
+				<div class="col s12">
+					I would like to generate
+					<div class="input-field inline">
+						<input id="topic_num" type="text" class="validate"> <label
+							for="topic_num">1-10</label>
+					</div>
+					topics <a href="#!" id="startlda" class="btn">Start</a>
 				</div>
-				<div class="modal-footer">
-					<a href="#!" id="startlda"
-						class="modal-action waves-effect waves-green btn-flat ">Start</a>
-						<div class="preloader-wrapper big active" id="pre" style="display:none">
-						    <div class="spinner-layer spinner-blue-only">
-						      <div class="circle-clipper left">
-						        <div class="circle"></div>
-						      </div>
-						      <div class="gap-patch">
-						        <div class="circle"></div>
-						      </div>
-						      <div class="circle-clipper right">
-						        <div class="circle"></div>
-						      </div>
-						    </div>
-						</div>
-				</div>
+				<hr>
+				<form action="#" id="views"></form>
 			</div>
+			<div class="col s12">
+				<a class="btn right" id="close" style="display: none">Add to
+					thread</a>
+			</div>
+			<div id="pre" class="centered" style="display: none">
+				<div class="preloader-wrapper big active">
+					<div class="spinner-layer spinner-blue-only">
+						<div class="circle-clipper left">
+							<div class="circle"></div>
+						</div>
+						<div class="gap-patch">
+							<div class="circle"></div>
+						</div>
+						<div class="circle-clipper right">
+							<div class="circle"></div>
+						</div>
+					</div>
+				</div>
+				<p>Mapping...</p>
+			</div>
+			<div class="col s12">
+				<ul class="collapsible" data-collapsible="accordion" id="result"
+					style="display: none">
+				</ul>
+			</div>
+
 		</div>
 	</div>
 	
@@ -64,26 +84,24 @@
 		$(document).ready(function() {
 			$('select').material_select();
 			$('.modal').modal();
-			$("#show_views").click(function() {
-				$.ajax({
-					url : 'Show_view_list',
-					type : 'GET',
-					success : function(response) {
-						var json = $.parseJSON(response);
-						var p;
-						for (var i = 0; i < json.length; i++) {
-							p = $('<p/>');
-							//p.append("<td>" + json[i].id + "</td>");
-							p.append('<input type="checkbox" id="'+json[i].idview+'" title="'+json[i].count+'" /> <label for="'+json[i].idview+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
-							$('#views').append(p);
-						}
-						console.log(json);
+			$.ajax({
+				url : 'Show_view_list',
+				type : 'GET',
+				success : function(response) {
+					var json = $.parseJSON(response);
+					var p;
+					for (var i = 0; i < json.length; i++) {
+						p = $('<p/>');
+						//p.append("<td>" + json[i].id + "</td>");
+						p.append('<input type="checkbox" id="'+json[i].idview+'" title="'+json[i].count+'" /> <label for="'+json[i].idview+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
+						$('#views').append(p);
 					}
-				});
+					console.log(json);
+				}
 			});
 			var count=0;
 
-			$(document).on('click', 'input' , function() {
+			$(document).on('click', '#views input' , function() {
 				console.log($(this));
 				console.log($(this)[0].checked);
 				console.log($(this)[0].title);
@@ -110,6 +128,7 @@
 			$("#startlda").click(function() {
 				var sql = "";
 				var tag = 0;
+				$('#views_div').hide();
 				$('#pre').show();
 				$("input:checkbox:checked").each(function(){
 					if(tag == 0){
@@ -123,11 +142,12 @@
 				
 				console.log(sql)
 				$.ajax({
-					url : "http://naifeng.uab.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic=8",
+					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 					type : 'GET',
 					success : function(response) {
-						$('#modal1').modal('close');
 						$('#pre').hide();
+						$('#result').show();
+						$('#close').show();
 						console.log(response.lda_msg.topic_ids);
 						tmp = response.lda_msg.topic_ids.replace("['", "").replace("']", "").split("', '");
 						var li;
@@ -157,7 +177,7 @@
 										ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
 									}
 
-									newdiv = $('<div></div>').jQCloud(ttt, {
+									newdiv = $('<div class="center-align"></div>').jQCloud(ttt, {
 										  width: 800,
 										  height: 600
 										});
