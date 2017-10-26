@@ -43,10 +43,26 @@
 				<hr>
 				<form action="#" id="views"></form>
 			</div>
+			
 			<div class="col s12">
-				<a class="btn right" id="close" style="display: none">Add to
+				<a class="waves-effect waves-light btn modal-trigger right" href="#modal5" id="close" style="display: none">Add to
 					thread</a>
 			</div>
+
+			<div id="modal5" class="modal">
+				<div class="modal-content">
+					<h4>Create Thread</h4>
+					<div class="input-field col s6">
+						<input id="thread_name" type="text" class="validate"> <label
+							for="thread_name">Thread Name</label>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<a href="#!"
+						class="modal-action modal-close waves-effect waves-green btn-flat">Save</a>
+				</div>
+			</div>
+
 			<div id="pre" class="centered" style="display: none">
 				<div class="preloader-wrapper big active">
 					<div class="spinner-layer spinner-blue-only">
@@ -93,7 +109,7 @@
 					for (var i = 0; i < json.length; i++) {
 						p = $('<p/>');
 						//p.append("<td>" + json[i].id + "</td>");
-						p.append('<input type="checkbox" id="'+json[i].idview+'" title="'+json[i].count+'" /> <label for="'+json[i].idview+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
+						p.append('<input type="checkbox" id="'+json[i].view_id+'" title="'+json[i].count+'" /> <label for="'+json[i].view_id+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
 						$('#views').append(p);
 					}
 					console.log(json);
@@ -125,24 +141,118 @@
 				  {text: "Adipiscing", weight: 5},
 				  /* ... */
 				];
+			
+			$(document).on('click', '.select-all', function(){
+				console.log($(this)[0].id);
+				console.log(($(this)[0].id).replace("selectall", "checkbox"));
+				var classname = ($(this)[0].id).replace("selectall", "checkbox");
+				if($(this).prop('checked') == true){
+					$("."+classname).prop('checked', true);
+				}
+				else{
+					$("."+classname).prop('checked', false);
+				}
+			});
+			
 			$("#startlda").click(function() {
 				var sql = "";
 				var tag = 0;
+				var single_viewid = "";
 				$('#views_div').hide();
 				$('#pre').show();
 				$("input:checkbox:checked").each(function(){
 					if(tag == 0){
-				    	sql += "viewid=" + $(this)[0].id;
+				    	sql += "view_id='" + $(this)[0].id + "'";
 				    	tag += 1;
+				    	single_viewid = $(this)[0].id;
 					}
 					else{
-						sql += "+or+viewid=" + $(this)[0].id;
+						sql += "+or+view_id='" + $(this)[0].id +"'";
+						tag += 1;
 					}
 				});
 				
 				console.log(sql)
+				if(tag==100){
+					console.log(tag);
+					console.log(single_viewid);
+					$.ajax({
+						url: 'Show_saved_topic',
+				        type: 'GET',
+				        data: {view_id: single_viewid},
+				        success: function (response) {
+				        	var tt = $.parseJSON(response);
+				        	console.log(tt);
+				        	console.log(tt[0].topic_id);
+				        	$('#pre').hide();
+							$('#result').show();
+							$('#close').show();
+							tmp = tt[0].topic_id.split(",");
+							var li;
+							var newdiv;
+							var form;
+							console.log($("#topic_num").val());
+							for (var i = 0; i < $("#topic_num").val(); i++) {
+							    console.log(tmp[i]);
+							    $.ajax({
+							        url: 'Show_lda_result',
+							        type: 'GET',
+							        data: {id: tmp[i]},
+							        success: function (r) {
+							        	var rjson = $.parseJSON(r);
+							        	console.log(rjson[0]);
+							        	li = $('<li/>');
+										li.append('<div class="collapsible-header">'+rjson[0].topic_name+'</div><div class="collapsible-body" id="'+rjson[0].topic_id+'"></div>');
+										$('#result').append(li);
+
+										words = rjson[0].top_words.replace("['", "").replace("']", "").split("', '");
+										weights = rjson[0].word_prob.replace("[", "").replace("]", "").split(", ");
+										console.log(words);
+										console.log(weights);
+
+										var ttt = [];
+										for (var j = 0; j < words.length; j++){
+											console.log(parseFloat(weights[j])*100);
+											ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
+										}
+
+										newdiv = $('<div class="center-align"></div>').jQCloud(ttt, {
+											  width: 800,
+											  height: 600
+											});
+										
+										$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+										$('#'+rjson[0].topic_id+'').append(newdiv);
+										notes_id = rjson[0].top_notes_id;
+										console.log(notes_id);
+										
+										$.ajax({
+											url: 'Show_notes',
+									        type: 'POST',
+									        data: {notes_id: notes_id},
+									        success: function (n) {
+									        	var njson = $.parseJSON(n);
+									        	console.log(njson);
+									        	form = $('<form action="#" />');
+									        	for (var k = 0; k < njson.length; k++) {
+										        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'"  id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
+													
+												}
+									        	$('#'+rjson[0].topic_id+'').append(form);
+									        }
+										})
+
+							        }
+							    });
+							}
+				        }
+					})
+				}
+				else{
+					console.log(tag);
+					//url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 				$.ajax({
-					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
+					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.note_id,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 					type : 'GET',
 					success : function(response) {
 						$('#pre').hide();
@@ -153,7 +263,8 @@
 						var li;
 						var newdiv;
 						var form;
-						for (var i = 0; i < tmp.length; i++) {
+						console.log($("#topic_num").val());
+						for (var i = 0; i < $("#topic_num").val(); i++) {
 						    console.log(tmp[i]);
 						    $.ajax({
 						        url: 'Show_lda_result',
@@ -195,7 +306,7 @@
 								        	console.log(njson);
 								        	form = $('<form action="#" />');
 								        	for (var k = 0; k < njson.length; k++) {
-									        	form.append('<p><input type="checkbox" id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
+									        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'" id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
 												
 											}
 								        	$('#'+rjson[0].topic_id+'').append(form);
@@ -207,6 +318,7 @@
 						}
 					}
 				});
+				}
 			});
 		});
 	</script>
