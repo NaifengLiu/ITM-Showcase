@@ -36,7 +36,7 @@
 					I would like to generate
 					<div class="input-field inline">
 						<input id="topic_num" type="text" class="validate"> <label
-							for="topic_num">1-10</label>
+							for="topic_num">3-10</label>
 					</div>
 					topics <a href="#!" id="startlda" class="btn">Start</a>
 				</div>
@@ -96,7 +96,7 @@
 					style="display: none">
 				</ul>
 			</div>
-
+			
 		</div>
 	</div>
 	
@@ -309,7 +309,6 @@
 									
 									$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
 									$('#'+rjson[0].topic_id+'').append(newdiv);
-									$('#'+rjson[0].topic_id+'').append('<div class="chips"></div>');
 									notes_id = rjson[0].top_notes_id;
 									console.log(notes_id);
 									
@@ -340,15 +339,15 @@
 		
 		$('.chips').material_chip();
 		
-		$("#exclude").click(function(){
+		$("#exclude").click(function(e){
 			$("label:contains('"+$("#keyword").text()+"')").parent().hide();
 			
-			var text = $(this).text()+x;
-			x++;
-			var e = jQuery.Event("keydown");
-			e.which = 13; // # Some key code value
-			$(".chips input").val("text");
-			$(".chips input").trigger(e);
+			//var text = $(this).text()+x;
+			//x++;
+			//var e = jQuery.Event("keydown");
+			//e.which = 13; // # Some key code value
+			//$(".chips input").val($("#keyword").text());
+			//$(".chips input").trigger(e);
 			
 		});
 		$("#include").click(function(){
