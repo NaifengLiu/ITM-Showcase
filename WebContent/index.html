@@ -62,6 +62,18 @@
 						class="modal-action modal-close waves-effect waves-green btn-flat">Save</a>
 				</div>
 			</div>
+			
+			<div id="yesno" class="modal">
+				<div class="modal-content">
+				<h4 id="keyword">Create Thread</h4>
+					<a id="include" href="#!"
+						class="waves-effect btn">Must
+						Include</a> <a id="exclude" href="#!"
+						class="waves-effect btn">Exclude</a>
+						<a id="reset" href="#!"
+						class="waves-effect btn">Reset filter</a>
+				</div>
+			</div>
 
 			<div id="pre" class="centered" style="display: none">
 				<div class="preloader-wrapper big active">
@@ -213,7 +225,7 @@
 										var ttt = [];
 										for (var j = 0; j < words.length; j++){
 											console.log(parseFloat(weights[j])*100);
-											ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
+											ttt.push({text: words[j], weight: parseFloat(weights[j])*100, "handlers" : {click: function(res) { console.log(res); $('#yesno').modal('open');}}});
 										}
 
 										newdiv = $('<div class="center-align"></div>').jQCloud(ttt, {
@@ -250,9 +262,10 @@
 				}
 				else{
 					console.log(tag);
+					//url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.note_id,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 					//url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 				$.ajax({
-					url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.note_id,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
+					url : "http://web-tccl.arcc.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.id+AS+noteid,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")+and+nt.note_id=vn.note_id'&curr_id=21&num_topic="+$("#topic_num").val(),
 					type : 'GET',
 					success : function(response) {
 						$('#pre').hide();
@@ -285,15 +298,18 @@
 									var ttt = [];
 									for (var j = 0; j < words.length; j++){
 										console.log(parseFloat(weights[j])*100);
-										ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
+										//ttt.push({text: words[j], weight: parseFloat(weights[j])*100});
+										ttt.push({text: words[j], weight: parseFloat(weights[j])*100, "handlers" : {click: function(res) { $("#keyword").text(res.target.innerText); $('#yesno').modal('open');}}});
 									}
 
 									newdiv = $('<div class="center-align"></div>').jQCloud(ttt, {
 										  width: 800,
 										  height: 600
 										});
-									$('#'+rjson[0].topic_id+'').append(newdiv);
 									
+									$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+									$('#'+rjson[0].topic_id+'').append(newdiv);
+									$('#'+rjson[0].topic_id+'').append('<div class="chips"></div>');
 									notes_id = rjson[0].top_notes_id;
 									console.log(notes_id);
 									
@@ -306,7 +322,7 @@
 								        	console.log(njson);
 								        	form = $('<form action="#" />');
 								        	for (var k = 0; k < njson.length; k++) {
-									        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'" id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
+									        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'" id="'+rjson[0].topic_id+'_'+njson[k].id+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].id+'">'+njson[k].title+' / ' +njson[k].content +'</label></p>');
 												
 											}
 								        	$('#'+rjson[0].topic_id+'').append(form);
@@ -320,6 +336,26 @@
 				});
 				}
 			});
+		});
+		
+		$('.chips').material_chip();
+		
+		$("#exclude").click(function(){
+			$("label:contains('"+$("#keyword").text()+"')").parent().hide();
+			
+			var text = $(this).text()+x;
+			x++;
+			var e = jQuery.Event("keydown");
+			e.which = 13; // # Some key code value
+			$(".chips input").val("text");
+			$(".chips input").trigger(e);
+			
+		});
+		$("#include").click(function(){
+			$('#result form label:not(:contains("'+$("#keyword").text()+'"))').parent().hide();
+		});
+		$("#reset").click(function(){
+			$('#result form label').parent().show();
 		});
 	</script>
 </body>
