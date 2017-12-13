@@ -47,4 +47,28 @@ public abstract class DAO {
 		}
 		return null;
 	}
+	
+	public static boolean Update(String sql) {
+		Connection con;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+		}
+		catch(Exception e){
+			System.out.print(e);
+		} 
+		try
+		{
+			String uri="jdbc:mysql://localhost:3306/localdb";
+			con=DriverManager.getConnection(uri,"root","DtZBAxrN57Mx");
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.executeUpdate(sql);
+			con.close();
+			return true;
+		}
+		catch(SQLException e1){
+			System.out.print(e1);
+		}
+		return false;
+	}
 }

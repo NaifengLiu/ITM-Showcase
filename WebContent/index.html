@@ -45,7 +45,7 @@
 			</div>
 			
 			<div class="col s12">
-				<a class="waves-effect waves-light btn modal-trigger right" href="#modal5" id="close" style="display: none">Add to
+				<a class="btn right" id="close" style="display: none">Add to
 					thread</a>
 			</div>
 
@@ -106,7 +106,22 @@
 		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="js/materialize.min.js"></script>
 	<script src="js/jqcloud.min.js"></script>
+	<script>
+	var getUrlParameter = function getUrlParameter(sParam) {
+	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+	        sURLVariables = sPageURL.split('&'),
+	        sParameterName,
+	        i;
 
+	    for (i = 0; i < sURLVariables.length; i++) {
+	        sParameterName = sURLVariables[i].split('=');
+
+	        if (sParameterName[0] === sParam) {
+	            return sParameterName[1] === undefined ? true : sParameterName[1];
+	        }
+	    }
+	};
+	</script>
 
 	<script>
 		$(document).ready(function() {
@@ -233,8 +248,9 @@
 											  height: 600
 											});
 										
-										$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+										
 										$('#'+rjson[0].topic_id+'').append(newdiv);
+										$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label style="color:black;" for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
 										notes_id = rjson[0].top_notes_id;
 										console.log(notes_id);
 										
@@ -307,8 +323,9 @@
 										  height: 600
 										});
 									
-									$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
 									$('#'+rjson[0].topic_id+'').append(newdiv);
+									$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label style="color:black;" for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+									
 									notes_id = rjson[0].top_notes_id;
 									console.log(notes_id);
 									
@@ -355,6 +372,30 @@
 		});
 		$("#reset").click(function(){
 			$('#result form label').parent().show();
+		});
+		$("#close").click(function(){
+			var uid = getUrlParameter('uid');
+			var db = getUrlParameter('db');
+			var notes="insert into tmp_thread_note (author_id, note_id) values ";
+			$("#result input:checkbox:checked").each(function(){
+				notes += "('" +uid+ "','" + $(this)[0].id.split("_")[1] + "'), ";
+			});
+			notes = notes.slice(0, -2);
+			console.log(uid);
+			console.log(db);
+			console.log(notes);
+			
+			$.ajax({
+				url : 'Add_notes_to_thread',
+				type : 'POST',
+				data: {sql: notes},
+				success : function(response) {
+					console.log(response);
+					if(response=="success"){
+						window.close();
+					}
+				}
+			});
 		});
 	</script>
 </body>
