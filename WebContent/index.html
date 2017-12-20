@@ -376,11 +376,11 @@
 		$("#close").click(function(){
 			var uid = getUrlParameter('uid');
 			var db = getUrlParameter('db');
-			var notes="insert into tmp_thread_note (author_id, note_id) values ";
+			var notes="insert into tmp_thread_note (author_id, note_id) select '"+uid+"', note_id from note_table where ";
 			$("#result input:checkbox:checked").each(function(){
-				notes += "('" +uid+ "','" + $(this)[0].id.split("_")[1] + "'), ";
+				notes += "id=" + $(this)[0].id.split("_")[1] + " or ";
 			});
-			notes = notes.slice(0, -2);
+			notes = notes.slice(0, -3);
 			console.log(uid);
 			console.log(db);
 			console.log(notes);
