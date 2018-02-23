@@ -40,6 +40,39 @@
 					</div>
 					topics <a href="#!" id="startlda" class="btn">Start</a>
 				</div>
+				
+				<div class="col s12">
+					From 
+					<div class="input-field" style="width: 200px">
+					    <select id="fieldid">
+					      <option value="" disabled selected>Field</option>
+					      <option value="1">Language_Arts</option>
+					      <option value="2">Writing</option>
+					      <option value="4">Speaking_and_Listening</option>
+					      <option value="5">Study_Skills</option>
+					      <option value="6">Science</option>
+					      <option value="7">Earth_and_Space_Systems</option>
+					      <option value="8">Biology</option>
+					      <option value="9">Psychology</option>
+					      <option value="10">Medicine</option>
+					      <option value="11">Electricity</option>
+					      <option value="12">Light_and_Sound</option>
+					      <option value="13">Mechanics</option>
+					      <option value="14">Energy</option>
+					      <option value="16">Chemical_Matter_and_Processes</option>
+					      <option value="17">Environmental_Science</option>
+					      <option value="18">Scientific_Inquiry</option>
+					      <option value="19">History_and_nature_of_science</option>
+					      <option value="20">Scientific_Inventions</option>
+					      <option value="21">Human_Body</option>
+					      <option value="23">Citizenship</option>
+					      <option value="24">Community</option>
+					      <option value="25">Economics</option>
+					      <option value="26">Family</option>
+					    </select>
+					  </div>
+				</div>
+				
 				<hr>
 				<form action="#" id="views"></form>
 			</div>
@@ -199,6 +232,10 @@
 					}
 				});
 				
+				var fieldid = "";
+				//$("#fieldid :selected").text(); // The text content of the selected option
+				fieldid = $("#fieldid").val().toString();
+				
 				console.log(sql)
 				if(tag==100){
 					console.log(tag);
@@ -281,7 +318,7 @@
 					//url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.note_id,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 					//url : "http://tccl.rit.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='builder_ikit_org_GES_2014_2015'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.noteid,notetitle,notecontent+from+builder_ikit_org_GES_2014_2015.note_table+as+nt,builder_ikit_org_GES_2014_2015.view_note+as+vn+where+("+sql+")'&curr_id=21&num_topic="+$("#topic_num").val(),
 				$.ajax({
-					url : "http://web-tccl.arcc.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.id+AS+noteid,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")+and+nt.note_id=vn.note_id'&curr_id=21&num_topic="+$("#topic_num").val(),
+					url : "http://web-tccl.arcc.albany.edu:5000/lda_process?user='root'&password='DtZBAxrN57Mx'&db_name='localdb'&host='localhost'&port='3306'&sql_query='select+DISTINCT+nt.id+AS+noteid,title,content+from+localdb.note_table+as+nt,localdb.view_note+as+vn+where+("+sql+")+and+nt.note_id=vn.note_id'&curr_id="+fieldid+"&num_topic="+$("#topic_num").val(),
 					type : 'GET',
 					success : function(response) {
 						$('#pre').hide();
