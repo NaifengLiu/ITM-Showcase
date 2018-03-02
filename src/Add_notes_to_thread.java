@@ -41,6 +41,7 @@ public class Add_notes_to_thread extends HttpServlet {
 		// TODO Auto-generated method stub
 		String sql = request.getParameter("sql");
 		PrintWriter out = response.getWriter();
+		Note.Update("delete from tmp_thread_note");
 		if(Note.Update(sql))
 		{
 			out.print("success");
