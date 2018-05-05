@@ -18,19 +18,13 @@
 			<form class="col s12">
 				<br> <br>
 				<div class="row">
-					<div class="col s6">
+					<div class="col s12">
 						<p>Please copy the link from Wikipedia to here</p>
-					</div>
-					<div class="col s6">
-						<p>Or directly enter the key word</p>
 					</div>
 				</div>
 				<div class="row">
-					<div class="input-field col s6">
+					<div class="input-field col s12">
 						<div id="1" class="chips"></div>
-					</div>
-					<div class="input-field col s6">
-						<div id="2" class="chips"></div>
 					</div>
 				</div>
 			</form>
@@ -40,6 +34,40 @@
 			<div class="input-field col s6">
 				<input id="topic_name" type="text" class="validate"> <label
 					for="topic_name">Give it a name</label>
+			</div>
+		</div>
+		<div class="divider"></div>
+		<div class="row">
+			<div class="col s12">
+				<p>And it belongs to this curriculum area</p>
+				<div class="input-field col s12">
+					<select id="fieldid">
+						<option value="" disabled selected>Choose your option</option>
+						<option value="1">Language_Arts</option>
+						<option value="2">Writing</option>
+						<option value="4">Speaking_and_Listening</option>
+						<option value="5">Study_Skills</option>
+						<option value="6">Science</option>
+						<option value="7">Earth_and_Space_Systems</option>
+						<option value="8">Biology</option>
+						<option value="9">Psychology</option>
+						<option value="10">Medicine</option>
+						<option value="11">Electricity</option>
+						<option value="12">Light_and_Sound</option>
+						<option value="13">Mechanics</option>
+						<option value="14">Energy</option>
+						<option value="16">Chemical_Matter_and_Process</option>
+						<option value="17">Environmental_Science</option>
+						<option value="18">Scientific_Inquiry</option>
+						<option value="19">History_and_nature_of_science</option>
+						<option value="20">Scientific_Inventions</option>
+						<option value="21">Human_Body</option>
+						<option value="23">Citizenship</option>
+						<option value="24">Community</option>
+						<option value="25">Economics</option>
+						<option value="26">Family</option>
+					</select> <label>Curriculum area</label>
+				</div>
 			</div>
 		</div>
 		<div class="divider"></div>
@@ -56,13 +84,25 @@
 		<div class="row" id="done" style="display: none">
 			<h4>Training done!</h4>
 		</div>
+		<ul id='dropdown1' class='dropdown-content'>
+			<li><a href="#!">one</a></li>
+			<li><a href="#!">two</a></li>
+			<li class="divider"></li>
+			<li><a href="#!">three</a></li>
+			<li><a href="#!"><i class="material-icons">view_module</i>four</a></li>
+			<li><a href="#!"><i class="material-icons">cloud</i>five</a></li>
+		</ul>
 	</div>
-	<script type="text/javascript"
-		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="js/jquery-3.2.1.js"></script>
 	<script type="text/javascript" src="js/materialize.min.js"></script>
 	<script src="js/jqcloud.min.js"></script>
 	<script>
-		$('.chips').material_chip();
+	$('.chips').chips();
+		
+		$(document).ready(function() {
+			$('select').formSelect();
+		  });
+
 
 		$("#start")
 				.click(
@@ -75,14 +115,19 @@
 							} else {
 								tmp_split = $("#1").text().replace(/close/g,
 										",")
+								
+								tmp_split = tmp_split.replace(/close/g, ",")
 							}
 							console.log(tmp_split);
 
 							var sql;
-							sql = "insert into train_request (links, name, area, author) Values ('"+tmp_split+"', '"+$("#topic_name").val()+"', 'Mathematics', 'Naifeng Liu');";
+							sql = "insert into train_request (links, name, area, author) Values ('"
+									+ tmp_split
+									+ "', '"
+									+ $("#topic_name").val()
+									+ "', '"+$( "#fieldid option:selected" ).text()+"_"+$( "#fieldid option:selected" ).val()+"', 'Naifeng Liu');";
 							console.log(sql);
-							
-							
+
 							$.ajax({
 								url : 'Topic_request',
 								type : 'GET',
@@ -93,7 +138,6 @@
 									console.log(response);
 								}
 							});
-							
 
 						});
 	</script>

@@ -104,30 +104,33 @@
 						for (var k = 0; k < njson.length; k++) {
 							li
 									.append('<div>'
-											+ njson[0].name
-											+ ' <span class="grey-text">by</span> '
-											+ njson[0].author
-											+ '<a href="#modal1" class="secondary-content hidentitle modal-trigger"><i class="material-icons">send</i></a><span style="display:none">'
-											+ njson[0].links
+											+ njson[k].name
+											+ ' <span class="grey-text">by</span> <span>'
+											+ njson[k].author
+											+ '</span><a href="#modal1" class="right secondary-content hidentitle modal-trigger"><i class="material-icons">send</i></a><span style="display:none">'
+											+ njson[k].links
 											+ '</span><span style="display:none">'
-											+ njson[0].area + '</span></div>');
+											+ njson[k].area + '</span><span style="display:none">'+njson[k].name+'</span><span style="display:none">'+njson[k].id+'</span></div>');
 
 						}
 						$('#box').append(li);
 
 					}
 				})
-
+		var id;
 		$(document).on('click', '.hidentitle', function() {
 			console.log($(this));
-			console.log($(this).parent()[0].children[2]);
+			console.log($(this).parent()[0]);
 			console.log($(this).parent()[0].children[2].textContent);
 
-			$("#links").text("321");
-			$("#topic_name").text("123");
-			$("#area_name").text();
-			$("#author_name").text();
+			$("#links").text($(this).parent()[0].children[3].textContent);
+			$("#topic_name").text($(this).parent()[0].children[5].textContent);
+			$("#area_name").text($(this).parent()[0].children[4].textContent);
+			$("#author_name").text($(this).parent()[0].children[1].textContent);
+			id=$(this).parent()[0].children[6].textContent;
 		});
+		
+		
 
 		$("#start")
 				.click(
@@ -135,24 +138,28 @@
 							$(".progress").show();
 							var word;
 							tmp_split = $("#links").text().split("/")
-
+							
+							console.log("id:"+id);
+							
 							word = tmp_split[tmp_split.length - 1]
 							//word = tmp_split[tmp_split.length - 1].replace(/_/g, " ")
 
 							console.log(word);
+							
+							foldername = ($("#area_name").text()).split("_")[1]
 
 							$
 									.ajax({
 										url : "http://web-tccl.arcc.albany.edu:5000/train_topic?curr_name='"
-												+ word + "'&curr_id=99",
+												+ word + "'&folder="+foldername+"&curr_id=99",
 										type : 'GET',
 										success : function(response) {
 											console.log(response)
 											$(".progress").hide();
 											$("#done").show();
 
-											var sql = "delete from train_request where name='"
-													+ word + "'";
+											var sql = "delete from train_request where id='"
+													+ id + "'";
 
 											$.ajax({
 												url : 'Topic_management',
@@ -161,7 +168,7 @@
 													sql : sql
 												},
 												success : function(response) {
-													console.log(response);
+													location.reload();
 												}
 											});
 										}

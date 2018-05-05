@@ -28,53 +28,83 @@
 			<!-- Modal Trigger -->
 
 			<!-- Modal Structure -->
-			<div class="col s12" id="views_div">
-				<h5 style="text-align: center;">
-					Select views (notes selected: <span id="notecount">0</span>)
-				</h5>
-				<div class="col s12">
-					I would like to generate
-					<div class="input-field inline">
-						<input id="topic_num" type="text" class="validate"> <label
-							for="topic_num">3-10</label>
+			
+			<div>
+				<div id="views_div" style="padding-top: 100px">
+					<div class="row">
+						<div class="col s12">
+							Select a subject area 
+							<div class="input-field" style="width: 300px">
+							    <select id="fieldid">
+							      <option value="" disabled selected>Please select a subject area</option>
+							      <option value="1">Language_Arts</option>
+							      <option value="2">Writing</option>
+							      <option value="4">Speaking_and_Listening</option>
+							      <option value="5">Study_Skills</option>
+							      <option value="6">Science</option>
+							      <option value="7">Earth_and_Space_Systems</option>
+							      <option value="8">Biology</option>
+							      <option value="9">Psychology</option>
+							      <option value="10">Medicine</option>
+							      <option value="11">Electricity</option>
+							      <option value="12">Light_and_Sound</option>
+							      <option value="13">Mechanics</option>
+							      <option value="14">Energy</option>
+							      <option value="16">Chemical_Matter_and_Processes</option>
+							      <option value="17">Environmental_Science</option>
+							      <option value="18">Scientific_Inquiry</option>
+							      <option value="19">History_and_nature_of_science</option>
+							      <option value="20">Scientific_Inventions</option>
+							      <option value="21">Human_Body</option>
+							      <option value="23">Citizenship</option>
+							      <option value="24">Community</option>
+							      <option value="25">Economics</option>
+							      <option value="26">Family</option>
+							    </select>
+							  </div>
+						</div>
 					</div>
-					topics <a href="#!" id="startlda" class="btn">Start</a>
+					<div class="divider"></div>
+					
+					<div class="row" id="subarea-div-id" style="display:none">
+						<br>
+						<div class="col s6">
+							Select a sub-area
+							<div id="subfield_div" class="input-field" style="width: 200px">
+							    <select id="subfieldid">
+							      <option value="" disabled selected>Please select a sub-area</option>
+							      <option value="0">Default</option>
+							    </select>
+							  </div>
+						</div>
+						<div class="col s6">
+							or <a class="waves-effect waves-light btn" href="./generate_new_topic.html">Set up a new sub-area</a>
+						</div>
+					</div>
+					
+					<div class="divider"></div>
+					
+					<div class="row" id="selectview-div-id" style="display:none">
+						<br>
+						<div class="col s12">
+							<a id="start-div-trigger" class="waves-effect waves-light btn modal-trigger" href="#modalx">Select views (notes selected: <span id="notecount">0</span>)</a>
+						</div>
+					</div>
+					
+					<div class="divider"></div>
+					
+					<div class="row" id="start-div-id" style="display:none">
+						<br>
+						<div class="col s12">
+							I would like to generate
+							<div class="input-field inline">
+								<input id="topic_num" type="text" class="validate"> <label
+									for="topic_num">3-10</label>
+							</div>
+							topics <a href="#!" id="startlda" class="btn">Start</a>
+						</div>
+					</div>
 				</div>
-				
-				<div class="col s12">
-					From 
-					<div class="input-field" style="width: 200px">
-					    <select id="fieldid">
-					      <option value="" disabled selected>Field</option>
-					      <option value="1">Language_Arts</option>
-					      <option value="2">Writing</option>
-					      <option value="4">Speaking_and_Listening</option>
-					      <option value="5">Study_Skills</option>
-					      <option value="6">Science</option>
-					      <option value="7">Earth_and_Space_Systems</option>
-					      <option value="8">Biology</option>
-					      <option value="9">Psychology</option>
-					      <option value="10">Medicine</option>
-					      <option value="11">Electricity</option>
-					      <option value="12">Light_and_Sound</option>
-					      <option value="13">Mechanics</option>
-					      <option value="14">Energy</option>
-					      <option value="16">Chemical_Matter_and_Processes</option>
-					      <option value="17">Environmental_Science</option>
-					      <option value="18">Scientific_Inquiry</option>
-					      <option value="19">History_and_nature_of_science</option>
-					      <option value="20">Scientific_Inventions</option>
-					      <option value="21">Human_Body</option>
-					      <option value="23">Citizenship</option>
-					      <option value="24">Community</option>
-					      <option value="25">Economics</option>
-					      <option value="26">Family</option>
-					    </select>
-					  </div>
-				</div>
-				
-				<hr>
-				<form action="#" id="views"></form>
 			</div>
 			
 			<div class="col s12">
@@ -95,6 +125,12 @@
 						class="modal-action modal-close waves-effect waves-green btn-flat">Save</a>
 				</div>
 			</div>
+			
+			<div id="modalx" class="modal">
+			    <div class="modal-content">
+			      <form action="#" id="views"></form>
+			    </div>
+			  </div>
 			
 			<div id="yesno" class="modal">
 				<div class="modal-content">
@@ -136,8 +172,8 @@
 	
 	<!--Import jQuery before materialize.js-->
 	<script type="text/javascript"
-		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="js/materialize.min.js"></script>
+		src="js/jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="js/materialize.js"></script>
 	<script src="js/jqcloud.min.js"></script>
 	<script>
 	var getUrlParameter = function getUrlParameter(sParam) {
@@ -158,21 +194,60 @@
 
 	<script>
 		$(document).ready(function() {
-			$('select').material_select();
+			$('select').formSelect();
 			$('.modal').modal();
+			$('.collapsible').collapsible();
+			
+			$(document).on('change','#fieldid',function(){
+				
+				$.ajax({
+					url : 'http://web-tccl.arcc.albany.edu:5000/get_subfield',
+					type : 'GET',
+					data: {field_id: $( "#fieldid option:selected" ).val()},
+					success : function(response) {
+						console.log(response);
+						console.log(response.sub_field_msg.success)
+						var jjj = response.sub_field_msg.success;
+						$('#subfieldid').empty().append('<option value="-1" disabled selected>Please select a sub-area</option>');
+						$('#subfieldid').empty().append('<option value="0">Default</option>');
+						$('select').formSelect();
+						for (var i = 0; i < jjj.length; i++) {
+							
+							console.log(jjj[i]);
+							
+							$('#subfieldid').append($('<option>', {value:i+1, text:jjj[i]}));
+							$('select').formSelect();
+						}
+						
+					}
+				});
+				
+				$("#subarea-div-id").show();
+	          });
+			
+			$(document).on('change','#subfieldid',function(){
+				
+				$("#selectview-div-id").show();
+	          });
+			
+			$("#start-div-trigger").click(function(){
+				$("#start-div-id").show();
+			})
+			
 			$.ajax({
 				url : 'Show_view_list',
 				type : 'GET',
 				success : function(response) {
 					var json = $.parseJSON(response);
+					console.log(json);
 					var p;
 					for (var i = 0; i < json.length; i++) {
 						p = $('<p/>');
 						//p.append("<td>" + json[i].id + "</td>");
-						p.append('<input type="checkbox" id="'+json[i].view_id+'" title="'+json[i].count+'" /> <label for="'+json[i].view_id+'">'+json[i].title+', contains: '+json[i].count+' notes</label>');
+						p.append('<label><input type="checkbox" id="'+json[i].view_id+'" title="'+json[i].count+'" /> <span>'+json[i].title+', contains: '+json[i].count+' notes</span></label>');
 						$('#views').append(p);
 					}
-					console.log(json);
+					
 				}
 			});
 			var count=0;
@@ -234,7 +309,13 @@
 				
 				var fieldid = "";
 				//$("#fieldid :selected").text(); // The text content of the selected option
-				fieldid = $("#fieldid").val().toString();
+				if($("#fieldid option:selected").val() == 0){
+					fieldid = $("#fieldid option:selected").val().toString()  + "_" +  $("#fieldid option:selected").text().toString();
+				}
+				else{
+					fieldid = $("#fieldid option:selected").val().toString()  + "/" +  $("#subfieldid option:selected").text().toString();
+				}
+				
 				
 				console.log(sql)
 				if(tag==100){
@@ -287,7 +368,7 @@
 										
 										
 										$('#'+rjson[0].topic_id+'').append(newdiv);
-										$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label style="color:black;" for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+										$('#'+rjson[0].topic_id+'').append('<label><input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><span>Select all notes</span></label>');
 										notes_id = rjson[0].top_notes_id;
 										console.log(notes_id);
 										
@@ -300,7 +381,7 @@
 									        	console.log(njson);
 									        	form = $('<form action="#" />');
 									        	for (var k = 0; k < njson.length; k++) {
-										        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'"  id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].noteid+'">'+njson[k].notetitle+' / ' +njson[k].notecontent +'</label></p>');
+										        	form.append('<p><label><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'"  id="'+rjson[0].topic_id+'_'+njson[k].noteid+'" /><span>'+njson[k].notetitle+' / ' +njson[k].notecontent +'</span></label></p>');
 													
 												}
 									        	$('#'+rjson[0].topic_id+'').append(form);
@@ -361,7 +442,7 @@
 										});
 									
 									$('#'+rjson[0].topic_id+'').append(newdiv);
-									$('#'+rjson[0].topic_id+'').append('<input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><label style="color:black;" for="selectall-'+rjson[0].topic_id+'">Select all notes</label>');
+									$('#'+rjson[0].topic_id+'').append('<label><input type="checkbox" class="right select-all" id="selectall-'+rjson[0].topic_id+'"/><span>Select all notes</span></label>');
 									
 									notes_id = rjson[0].top_notes_id;
 									console.log(notes_id);
@@ -375,7 +456,7 @@
 								        	console.log(njson);
 								        	form = $('<form action="#" />');
 								        	for (var k = 0; k < njson.length; k++) {
-									        	form.append('<p><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'" id="'+rjson[0].topic_id+'_'+njson[k].id+'" /><label for="'+rjson[0].topic_id+'_'+njson[k].id+'">'+njson[k].title+' / ' +njson[k].content +'</label></p>');
+									        	form.append('<p><label><input type="checkbox" class="checkbox-'+rjson[0].topic_id+'" id="'+rjson[0].topic_id+'_'+njson[k].id+'" /><span>'+njson[k].title+' / ' +njson[k].content +'</span></label></p>');
 												
 											}
 								        	$('#'+rjson[0].topic_id+'').append(form);
@@ -391,7 +472,6 @@
 			});
 		});
 		
-		$('.chips').material_chip();
 		
 		$("#exclude").click(function(e){
 			$("label:contains('"+$("#keyword").text()+"')").parent().hide();
